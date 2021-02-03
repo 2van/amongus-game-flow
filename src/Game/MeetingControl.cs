@@ -3,12 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Timers;
 
 namespace amongus_game_flow
 {
     public class MeetingControl
     {
         private static MeetingControl _instance;
+        private VoteControl _vote;
         public static MeetingControl Instance
         {
             get
@@ -26,21 +29,19 @@ namespace amongus_game_flow
         {
             get
             {
-                int conf_discuss = 1;//TODO: timeconf
                 long t = DateTimeOffset.Now.ToUnixTimeSeconds();
-                return this.startDiscussTime + conf_discuss - t;
+                return this.startDiscussTime + GameConfig.DiscussionTime - t;
             }
         }
         private long LeftVote
         {
             get
             {
-                int conf_vote = 1;//TODO: timeconf
                 long t = DateTimeOffset.Now.ToUnixTimeSeconds();
-                return this.startVoteTime + conf_vote - t;
+                return this.startVoteTime + GameConfig.VotingTime - t;
             }
         }
-        private void UpdateTime()
+        private void UpdateTime(Object source, System.Timers.ElapsedEventArgs e)
         {
             if (LeftDiscuss > 0)
             {
@@ -58,29 +59,41 @@ namespace amongus_game_flow
                 }
             }
         }
+        private static Timer aTimer;
         public void StartDiscuss()
         {
-            Console.WriteLine("startDiscuss");
+            aTimer = new System.Timers.Timer();
+            aTimer.Interval = 1000;
+
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += UpdateTime;
+
+            // Have the timer fire repeated events (true is the default)
+            aTimer.AutoReset = true;
+
+            // Start the timer
+            aTimer.Enabled = true;
+
+            Console.WriteLine("StartDiscuss");
             startDiscussTime = DateTimeOffset.Now.ToUnixTimeSeconds();
             startVoteTime = 0;
-            // TODO: timeconf
-            Task.Delay(2000).ContinueWith((a) =>
-            {
-                this.StartVote();
-                VoteControl.Instance.Init();
-            });
+            Task.Delay(GameConfig.DiscussionTime * 1000).ContinueWith((a) =>
+              {
+                  this.StartVote();
+              });
         }
         public void StartVote()
         {
+            Console.WriteLine("StartVote");
+            this._vote = new VoteControl();
             this.startDiscussTime = 0;
             this.startVoteTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-            // TODO: timeconf
-            Task.Delay(2000).ContinueWith((a) =>
+            Task.Delay(GameConfig.VotingTime * 1000).ContinueWith((a) =>
             {
-                VoteControl.Instance.AutoSkip();
+                this._vote.AutoSkip();
                 Console.WriteLine("voteFinish");
                 this.UpdateVoteUI();
-                VoteControl.Instance.CheckEjects();
+                this._vote.CheckEjects();
             });
         }
         public void UpdateVoteUI()
@@ -88,32 +101,25 @@ namespace amongus_game_flow
 
         }
 
+        public void Vote(int idx, int targetIdx)
+        {
+            this._vote.Vote(idx, targetIdx);
+        }
+
     }
     public class VoteControl
     {
-        Dictionary<string, List<int>> data;
-        public static VoteControl _instance;
-        public static VoteControl Instance
+        readonly Dictionary<string, List<int>> data;
+        public VoteControl()
         {
-            get
+            this.data = new Dictionary<string, List<int>>() { { "skip", new List<int>() } };
+            Global.room.players.ForEach(p =>
             {
-                if (_instance == null)
+                if (!p.dead)
                 {
-                    _instance = new VoteControl();
+                    data[p.id] = new List<int> { };
                 }
-                return _instance;
-            }
-        }
-        public void Init()
-        {
-            this.data = new Dictionary<string, List<int>>();
-            for (int i = 0; i < 2; i++)
-            {
-                if (true)
-                {
-                    data[i.ToString()] = new List<int> { };
-                }
-            }
+            });
         }
         public void AutoSkip()
         {
@@ -154,6 +160,7 @@ namespace amongus_game_flow
                 return;
             }
             this.data[targetIdx.ToString()].Add(idx);
+            Console.WriteLine($"{idx} vote {targetIdx}\n" + JsonConvert.SerializeObject(this.data, Formatting.Indented));
         }
         public bool IsVoted(int idx)
         {
@@ -210,7 +217,7 @@ namespace amongus_game_flow
             if (rs == GameResultType.Continue)
             {
                 // ghost
-                //Global.Main.playerController.updatePlayerDisplay();
+                // Global.Main.playerController.updatePlayerDisplay();
             }
         }
     }

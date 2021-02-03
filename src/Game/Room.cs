@@ -9,9 +9,8 @@ namespace amongus_game_flow
     {
         public Room()
         {
-            int playerCount = 4;
-            int impIdx = new Random().Next(playerCount);
-            for (int i = 0; i < playerCount; i++)
+            int impIdx = new Random().Next(GameConfig.PlayerCount);
+            for (int i = 0; i < GameConfig.PlayerCount; i++)
             {
                 PlayerControl p = new PlayerControl
                 {
@@ -20,6 +19,7 @@ namespace amongus_game_flow
                     id = i.ToString()
                 };
                 players.Add(p);
+                Global.task.GenerateTask(i);
             }
         }
         public List<PlayerControl> players = new List<PlayerControl> { };

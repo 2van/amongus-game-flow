@@ -20,7 +20,7 @@ namespace amongus_game_flow
                 return TaskControl._instance;
             }
         }
-        public Dictionary<int, List<List<PlayerTaskItem>>> allTaskData = new Dictionary<int, List<List<PlayerTaskItem>>>();
+        readonly private Dictionary<int, List<List<PlayerTaskItem>>> allTaskData = new Dictionary<int, List<List<PlayerTaskItem>>>();
 
         public List<List<PlayerTaskItem>> GenerateTask(int idx, int shortCount = 1, int longCount = 1)
         {

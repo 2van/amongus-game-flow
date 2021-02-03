@@ -50,15 +50,8 @@ namespace amongus_game_flow
 
         private GameResultType CheckTaskWin()
         {
-            bool rs = true;
-            foreach (var item in Global.task.allTaskData.Values)
-            {
-                if (!item.All(v => v.All(vv => vv.finished)))
-                {
-                    rs = false;
-                }
-            }
-            if (rs)
+            List<int> counts = Global.task.GetAllTaskProgress();
+            if (counts[0] == counts[1])
             {
                 Console.WriteLine("crewmate win：finishTask");
                 return GameResultType.FinishTask;

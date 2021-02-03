@@ -27,6 +27,7 @@ public class PlayerTaskItem
 }
 static public class GameConfig
 {
+    static public int PlayerCount = 4;
     static public string TaskConfigJson = @"
 {
     'shortT': [
@@ -61,4 +62,8 @@ static public class GameConfig
     ]
 }
 ";
+
+    // game settings
+    static public int DiscussionTime = 3;
+    static public int VotingTime = 5;
 }

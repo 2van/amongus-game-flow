@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "amongus-game-flow": {
+      "commandName": "Project"
+    },
+    "taskflow": {
+      "commandName": "Project",
+      "commandLineArgs": "task",
+      "workingDirectory": "C:\\Users\\Administrator\\Desktop"
+    },
+    "meetingflow": {
+      "commandName": "Project",
+      "commandLineArgs": "meeting"
+    }
+  }
+}
