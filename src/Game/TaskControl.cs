@@ -158,5 +158,17 @@ namespace amongus_game_flow
             ShowMyTask();
             ShowAllTaskProgress();
         }
+
+        private int currentJinji = -1;
+        private long jinjiStartTime = 0;
+        public void setJinji(int id)
+        {
+            this.jinjiStartTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+            this.currentJinji = id;
+        }
+        public void removeJinji()
+        {
+            this.currentJinji = -1;
+        }
     }
 }
