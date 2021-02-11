@@ -11,6 +11,14 @@
     "meetingflow": {
       "commandName": "Project",
       "commandLineArgs": "meeting"
+    },
+    "skill-crewmate": {
+      "commandName": "Project",
+      "commandLineArgs": "skill-crewmate"
+    },
+    "skill-impostor": {
+      "commandName": "Project",
+      "commandLineArgs": "skill-impostor"
     }
   }
 }

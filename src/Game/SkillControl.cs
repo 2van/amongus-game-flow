@@ -1,46 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace amongus_game_flow
 {
+    public enum SKILL_NAME
+    {
+        ShowTask,
+        Meeting,
+        Kill,
+        Damage,
+    }
     public class SkillControl
     {
         public SkillControl()
         {
-            this.skills.Add("Use", new Skill(10, 0, "Use"));
-            this.skills.Add("Use1", new Skill(10, 0, "Use1"));
-            this.skills.Add("Use2", new Skill(10, 0, "Use2"));
-            this.skills.Add("Use3", new Skill(10, 0, "Use3"));
+            if (Global.room.Self.isImpostor)
+            {
+                AddSkill(SKILL_NAME.Kill, 10);
+                AddSkill(SKILL_NAME.Damage, 10);
+            }
+            AddSkill(SKILL_NAME.Meeting, 0, 20);
+            AddSkill(SKILL_NAME.ShowTask);
         }
-        public Dictionary<string, Skill> skills = new Dictionary<string, Skill>();
-        public void Use(string skill, string data)
+        private void AddSkill(SKILL_NAME skillName, int cd = 0, int delay = 0)
+        {
+            this.skills.Add(skillName, new Skill(cd, delay, skillName));
+        }
+        public Dictionary<SKILL_NAME, Skill> skills = new Dictionary<SKILL_NAME, Skill>();
+        public void Use(SKILL_NAME skill, string data)
         {
             Skill _skill;
             if (!skills.TryGetValue(skill, out _skill))
             {
                 return; // or whatever you want to do
             }
+            long l = _skill.lastUseTime + _skill.cd - DateTimeOffset.Now.ToUnixTimeSeconds();
+            if (l > 0)
+            {
+                return;
+            }
             _skill.lastUseTime = DateTimeOffset.Now.ToUnixTimeSeconds();
             switch (skill)
             {
-                case "ShowTask":
+                case SKILL_NAME.ShowTask:
                     this.ShowTask(data);
                     break;
-                case "Meeting":
+                case SKILL_NAME.Meeting:
                     this.Meeting();
                     break;
-                case "Kill":
+                case SKILL_NAME.Kill:
                     this.Kill();
                     break;
-                case "Pohuai":
-                    this.Pohuai(data);
+                case SKILL_NAME.Damage:
+                    this.Damage(data);
                     break;
                 default:
                     break;
             }
         }
+        bool isEmergency(string taskName)
+        {
+            return taskName == "O2" || taskName == "Fix Light";
+        }
         void ShowTask(string taskName)
         {
+            if (Global.room.Self.isImpostor && !isEmergency(taskName))
+            {
+                return;
+            }
             Console.WriteLine("open mini game:" + taskName);
         }
         void Meeting()
@@ -49,6 +77,10 @@ namespace amongus_game_flow
         }
         void Kill()
         {
+            if (!Global.room.Self.isImpostor)
+            {
+                return;
+            }
             // TODO: at kill range
             int idx = Global.room.players.FindIndex(v => !v.isImpostor && !v.dead);
             if (idx >= 0)
@@ -58,27 +90,34 @@ namespace amongus_game_flow
                 // sync game
             }
         }
-        void Pohuai(string type)
+        void Damage(string type)
         {
             Global.task.setJinji(Int16.Parse(type));
         }
     }
     public class Skill
     {
-        private int cd = 10;
+        public int cd = 10;
         private int delay = 0;
-        private string skillName = "";
+        private SKILL_NAME skillName;
         public long lastUseTime = 0;
-        public Skill(int cd, int delay, string skill)
+        public Skill(int cd, int delay, SKILL_NAME skill)
         {
             this.cd = cd;
             this.delay = delay;
             this.skillName = skill;
             if (this.delay > 0)
             {
-                this.lastUseTime = DateTimeOffset.Now.ToUnixTimeSeconds()
-                    + this.cd - this.delay;
+                this.lastUseTime = DateTimeOffset.Now.ToUnixTimeSeconds() + this.delay;
             }
+            Task.Run(async () =>
+            {
+                for (; ; )
+                {
+                    await Task.Delay(1000);
+                    Update();
+                }
+            });
         }
 
         void UpdateSkillDisplay()
@@ -88,7 +127,7 @@ namespace amongus_game_flow
 
         void Update()
         {
-            if (this.skillName == "use")
+            if (this.skillName == SKILL_NAME.ShowTask)
             {
                 return;
             }

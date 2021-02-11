@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace amongus_game_flow
 {
-    // TODO: ROOM
     public class Room
     {
         public Room()
@@ -21,7 +20,10 @@ namespace amongus_game_flow
                 players.Add(p);
                 Global.task.GenerateTask(i);
             }
+            this.impIdxs.Add(impIdx);
+            //TODO: 2 impostors
         }
+        public List<int> impIdxs= new List<int>();
         public List<PlayerControl> players = new List<PlayerControl> { };
         public int selfIdx = 0;
         public PlayerControl Self => players[selfIdx];

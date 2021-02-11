@@ -16,8 +16,11 @@ namespace amongus_game_flow
                 case "meeting":
                     TestMeetingflow();
                     break;
-                case "skill":
-                    TestSkill();
+                case "skill-crewmate":
+                    TestSkillCrewmate();
+                    break;
+                case "skill-impostor":
+                    TestSkillImpostor();
                     break;
                 default:
                     break;
@@ -47,9 +50,23 @@ namespace amongus_game_flow
             Console.ReadLine();
         }
 
-        static void TestSkill()
+        static void TestSkillCrewmate()
         {
-
+            Console.WriteLine(Global.room.Self.isImpostor ? "impostor" : "crewmate");
+            Global.skill.Use(SKILL_NAME.ShowTask, "Admin");
+            Global.skill.Use(SKILL_NAME.Meeting, "");
+            Global.skill.Use(SKILL_NAME.Kill, "");
+            Global.skill.Use(SKILL_NAME.Damage, "1");
+            Console.ReadLine();
+        }
+        static void TestSkillImpostor()
+        {
+            Global.room.selfIdx = Global.room.impIdxs[0];
+            Global.skill.Use(SKILL_NAME.ShowTask, "O2");
+            Global.skill.Use(SKILL_NAME.Meeting, "");
+            Global.skill.Use(SKILL_NAME.Kill, "");
+            Global.skill.Use(SKILL_NAME.Damage, "1");
+            Console.ReadLine();
         }
     }
 }
