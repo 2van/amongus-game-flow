@@ -1,11 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace amongus_game_flow
 {
     public class SkillControl
     {
+        public SkillControl()
+        {
+            this.skills.Add("Use", new Skill(10, 0, "Use"));
+            this.skills.Add("Use1", new Skill(10, 0, "Use1"));
+            this.skills.Add("Use2", new Skill(10, 0, "Use2"));
+            this.skills.Add("Use3", new Skill(10, 0, "Use3"));
+        }
+        public Dictionary<string, Skill> skills = new Dictionary<string, Skill>();
         public void Use(string skill, string data)
         {
+            Skill _skill;
+            if (!skills.TryGetValue(skill, out _skill))
+            {
+                return; // or whatever you want to do
+            }
+            _skill.lastUseTime = DateTimeOffset.Now.ToUnixTimeSeconds();
             switch (skill)
             {
                 case "ShowTask":
@@ -24,15 +39,15 @@ namespace amongus_game_flow
                     break;
             }
         }
-        public void ShowTask(string taskName)
+        void ShowTask(string taskName)
         {
             Console.WriteLine("open mini game:" + taskName);
         }
-        public void Meeting()
+        void Meeting()
         {
             Global.meeting.StartDiscuss();
         }
-        public void Kill()
+        void Kill()
         {
             // TODO: at kill range
             int idx = Global.room.players.FindIndex(v => !v.isImpostor && !v.dead);
@@ -43,7 +58,7 @@ namespace amongus_game_flow
                 // sync game
             }
         }
-        public void Pohuai(string type)
+        void Pohuai(string type)
         {
             Global.task.setJinji(Int16.Parse(type));
         }
@@ -53,7 +68,7 @@ namespace amongus_game_flow
         private int cd = 10;
         private int delay = 0;
         private string skillName = "";
-        private long lastUseTime = 0;
+        public long lastUseTime = 0;
         public Skill(int cd, int delay, string skill)
         {
             this.cd = cd;
@@ -66,12 +81,6 @@ namespace amongus_game_flow
             }
         }
 
-        void Use(string skill, string data)
-        {
-            this.skillName = skill;
-            Global.skill.Use(skill, data);
-            this.lastUseTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-        }
         void UpdateSkillDisplay()
         {
 

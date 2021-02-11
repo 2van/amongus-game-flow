@@ -16,6 +16,9 @@ namespace amongus_game_flow
                 case "meeting":
                     TestMeetingflow();
                     break;
+                case "skill":
+                    TestSkill();
+                    break;
                 default:
                     break;
             }
@@ -42,6 +45,11 @@ namespace amongus_game_flow
             Global.meeting.Vote(1, 1);
             Global.meeting.Vote(2, 0);
             Console.ReadLine();
+        }
+
+        static void TestSkill()
+        {
+
         }
     }
 }
