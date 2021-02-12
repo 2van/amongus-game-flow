@@ -88,6 +88,7 @@ namespace amongus_game_flow
             {
                 Console.WriteLine("do task fail-unexisting " + name + location);
             }
+            Global.game.CheckWin();
             return rs;
         }
         public class TaskState
@@ -97,7 +98,7 @@ namespace amongus_game_flow
             public PlayerTaskItem current;
         }
 
-        private Dictionary<int, List<List<PlayerTaskItem>>> RealTaskData => allTaskData
+        public Dictionary<int, List<List<PlayerTaskItem>>> RealTaskData => allTaskData
             .Where((v, i) => !Global.room.players[i].isImpostor)
             .ToDictionary(i => i.Key, i => i.Value);
         public List<TaskState> GetTaskProgress(int idx)
@@ -159,16 +160,20 @@ namespace amongus_game_flow
             ShowAllTaskProgress();
         }
 
-        private int currentJinji = -1;
-        private long jinjiStartTime = 0;
-        public void setJinji(int id)
+        private DamageSystem damage;
+        public void setDamage(int id)
         {
-            this.jinjiStartTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-            this.currentJinji = id;
+            this.removeDamage();
+            Console.WriteLine("setDamage " + id);
+            this.damage = new DamageSystem(id);
         }
-        public void removeJinji()
+        public void removeDamage()
         {
-            this.currentJinji = -1;
+            if (this.damage != null)
+            {
+                this.damage.Destroy();
+            }
+            this.damage = null;
         }
     }
 }

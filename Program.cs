@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace amongus_game_flow
@@ -21,6 +23,9 @@ namespace amongus_game_flow
                     break;
                 case "skill-impostor":
                     TestSkillImpostor();
+                    break;
+                case "game":
+                    TestGameFlow();
                     break;
                 default:
                     break;
@@ -52,7 +57,6 @@ namespace amongus_game_flow
 
         static void TestSkillCrewmate()
         {
-            Console.WriteLine(Global.room.Self.isImpostor ? "impostor" : "crewmate");
             Global.skill.Use(SKILL_NAME.ShowTask, "Admin");
             Global.skill.Use(SKILL_NAME.Meeting, "");
             Global.skill.Use(SKILL_NAME.Kill, "");
@@ -61,12 +65,28 @@ namespace amongus_game_flow
         }
         static void TestSkillImpostor()
         {
-            Global.room.selfIdx = Global.room.impIdxs[0];
             Global.skill.Use(SKILL_NAME.ShowTask, "O2");
             Global.skill.Use(SKILL_NAME.Meeting, "");
             Global.skill.Use(SKILL_NAME.Kill, "");
             Global.skill.Use(SKILL_NAME.Damage, "1");
             Console.ReadLine();
+        }
+
+        static void TestGameFlow()
+        {
+            // 做任务结束
+            foreach (KeyValuePair<int, List<List<PlayerTaskItem>>> entry in Global.task.RealTaskData)
+            {
+                Global.task.RealTaskData[entry.Key].ForEach(v =>
+                {
+                    v.ForEach(vv => Global.task.DoTask(entry.Key, vv.name, vv.location));
+                });
+            }
+            // 紧急结束
+            Global.skill.Use(SKILL_NAME.Damage, "1");
+            // TODO: Reset Game
+            Console.ReadLine();
+
         }
     }
 }

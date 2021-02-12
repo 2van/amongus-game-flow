@@ -75,12 +75,17 @@ namespace amongus_game_flow
             //}
             return GameResultType.Continue;
         }
-        private void ShowGameOver(bool crewmateVictory)
+        public void ShowGameOver(bool crewmateVictory)
         {
             Console.WriteLine("game over");
             if (crewmateVictory)
             {
                 Console.WriteLine("crewmate victory");
+            }
+            else
+            {
+
+                Console.WriteLine("impostor victory");
             }
         }
     }

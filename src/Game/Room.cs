@@ -20,7 +20,9 @@ namespace amongus_game_flow
                 players.Add(p);
                 Global.task.GenerateTask(i);
             }
-            this.impIdxs.Add(impIdx);
+            impIdxs.Add(impIdx);
+            selfIdx = impIdxs[0]; // TEST Impostor
+            Console.WriteLine(Self.isImpostor ? "impostor" : "crewmate");
             //TODO: 2 impostors
         }
         public List<int> impIdxs= new List<int>();

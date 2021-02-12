@@ -30,6 +30,7 @@ namespace amongus_game_flow
         public Dictionary<SKILL_NAME, Skill> skills = new Dictionary<SKILL_NAME, Skill>();
         public void Use(SKILL_NAME skill, string data)
         {
+            Console.WriteLine("Use " + skill + " " + data);
             Skill _skill;
             if (!skills.TryGetValue(skill, out _skill))
             {
@@ -87,12 +88,13 @@ namespace amongus_game_flow
             {
                 Console.WriteLine("kill player " + idx);
                 Global.room.players[idx].dead = true;
+                Global.game.CheckWin();
                 // sync game
             }
         }
         void Damage(string type)
         {
-            Global.task.setJinji(Int16.Parse(type));
+            Global.task.setDamage(Int16.Parse(type));
         }
     }
     public class Skill
@@ -138,7 +140,7 @@ namespace amongus_game_flow
             }
             else
             {
-                Console.WriteLine(this.skillName + ":" + l);
+                Console.WriteLine(this.skillName + " CD:" + l + "s");
             }
         }
     }
